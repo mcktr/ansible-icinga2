@@ -1,0 +1,6 @@
+- hosts: icinga2-master
+  become_user: root
+  become_method: su
+  roles:
+    - standard
+    - icinga2-master

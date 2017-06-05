@@ -1,0 +1,2 @@
+*.retry
+roles/icinga2-master/vars/main.yml

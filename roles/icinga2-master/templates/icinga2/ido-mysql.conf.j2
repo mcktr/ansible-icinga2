@@ -1,0 +1,15 @@
+// {{ ansible_managed }}
+
+/**
+ * The db_ido_mysql library implements IDO functionality
+ * for MySQL.
+ */
+
+library "db_ido_mysql"
+
+object IdoMysqlConnection "ido-mysql" {
+  user = "{{ mariadb_icinga_user }}",
+  password = "{{ mariadb_icinga_password }}",
+  host = "localhost",
+  database = "{{ mariadb_icinga_db }}"
+}

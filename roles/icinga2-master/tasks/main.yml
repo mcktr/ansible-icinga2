@@ -1,0 +1,335 @@
+- name: apt present apt-transport-https
+  apt:
+    update_cache: yes
+    name: apt-transport-https
+    state: present
+  become: true
+
+- name: template apt/icinga.list
+  template:
+    src: apt/icinga.list.j2
+    dest: /etc/apt/sources.list.d/icinga.list
+  become: true
+
+- name: apt_key present {{ icinga_repository_key}}
+  apt_key:
+    url: "{{ icinga_repository_key }}"
+    state: present
+  become: true
+
+- name: apt present icinga2
+  apt:
+    update_cache: yes
+    name: icinga2
+    state: present
+  become: true
+
+- name: apt present monitoring-plugins
+  apt:
+    update_cache: yes
+    name: monitoring-plugins
+    state: present
+  become: true
+
+- name: apt present icinga2-ido-mysql
+  apt:
+    update_cache: yes
+    name: icinga2-ido-mysql
+    state: present
+  become: true
+
+- name: apt present mariadb-server
+  apt:
+    update_cache: yes
+    name: mariadb-server
+    state: present
+  become: true
+  register: mariadb_server_install
+
+- name: apt present mariadb-client
+  apt:
+    update_cache: yes
+    name: mariadb-client
+    state: present
+  become: true
+
+- name: apt present python-mysqldb
+  apt:
+    update_cache: yes
+    name: python-mysqldb
+    state: present
+  become: true
+
+- name: mysql_user present root 
+  mysql_user:
+    login_user: "{{ mariadb_root_user }}"
+    name: root
+    password: "{{ mariadb_root_password }}"
+    state: present
+  become: true
+  when: mariadb_server_install.changed
+
+- name: mysql_db present {{ mariadb_icinga_db }}
+  mysql_db:
+    login_user: "{{ mariadb_root_user }}"
+    login_password: "{{ mariadb_root_password }}"
+    name: "{{ mariadb_icinga_db }}"
+    state: present
+  become: true
+  register: mariadb_icinga_db_created
+
+- name: mysql_db import {{ mariadb_icinga_db }}
+  mysql_db:
+    login_user: "{{ mariadb_root_user }}"
+    login_password: "{{ mariadb_root_password }}"
+    name: "{{ mariadb_icinga_db }}"
+    state: import
+    target: /usr/share/icinga2-ido-mysql/schema/mysql.sql
+  become: true
+  when: mariadb_icinga_db_created.changed
+
+- name: mysql_user priv {{ mariadb_icinga_user }}
+  mysql_user: 
+    login_user: "{{ mariadb_root_user }}"
+    login_password: "{{ mariadb_root_password }}"
+    name: "{{ mariadb_icinga_user }}"
+    password: "{{ mariadb_icinga_password }}"  
+    host: localhost
+    priv: "{{ mariadb_icinga_db }}.*:ALL"
+  become: true
+
+- name: template icinga2/ido-mysql.conf
+  template:
+    src: icinga2/ido-mysql.conf.j2
+    dest: /etc/icinga2/features-available/ido-mysql.conf
+  become: true
+
+- name: command icinga2 feature enable ido-mysql
+  command: /usr/sbin/icinga2 feature enable ido-mysql
+  become: true
+
+- name: apt present nginx
+  apt:
+    update-cache: yes
+    name: nginx
+    state: present
+  become: true
+
+- name: command icinga2 feature enable command
+  command: /usr/sbin/icinga2 feature enable command
+  become: true
+
+- name: user present www-data
+  user:
+    name: www-data
+    groups: nagios
+    append: yes
+    state: present
+  become: true
+
+- name: apt present php5-fpm
+  apt:
+    name: php5-fpm
+    state: present
+    update_cache: yes
+  become: true
+
+- name: apt present php5-mysql
+  apt: 
+    name: php5-mysql
+    state: present
+    update_cache: yes
+  become: true
+
+- name: apt present php5-gd
+  apt:
+    name: php5-gd
+    state: present
+    update_cache: yes
+  become: true
+
+- name: apt present php5-intl
+  apt:
+    name: php5-intl
+    state: present
+    update_cache: yes
+  become: true
+
+- name: apt present php5-curl
+  apt:
+    name: php5-curl
+    state: present
+    update_cache: yes
+  become: true
+
+- name: apt present php5-imagick
+  apt:
+    name: php5-imagick
+    state: present
+    update_cache: yes
+  become: true
+
+- name: apt present icingaweb2
+  apt:
+    name: icingaweb2
+    state: present
+    update_cache: yes
+  become: true
+
+- name: mysql_db present {{ mariadb_icingaweb2_db }}
+  mysql_db:
+    login_user: "{{ mariadb_root_user }}"
+    login_password: "{{ mariadb_root_password }}"
+    name: "{{ mariadb_icingaweb2_db }}"
+    state: present
+  become: true
+  register: mariadb_icingaweb2_db_created
+
+- name: mysql_db import {{ mariadb_icingaweb2_db }}  
+  mysql_db:
+    login_user: "{{ mariadb_root_user }}"
+    login_password: "{{ mariadb_root_password }}"
+    name: "{{ mariadb_icingaweb2_db }}"
+    state: import
+    target: /usr/share/icingaweb2/etc/schema/mysql.schema.sql
+  become: true
+  when: mariadb_icingaweb2_db_created.changed
+
+- name: mysql_user priv {{ mariadb_icingaweb2_user }}
+  mysql_user:
+    login_user: "{{ mariadb_root_user }}"
+    login_password: "{{ mariadb_root_password }}"
+    name: "{{ mariadb_icingaweb2_user }}"
+    password: "{{ mariadb_icingaweb2_password }}"
+    host: localhost
+    priv: "{{ mariadb_icingaweb2_db }}.*:ALL"
+  become: true
+
+- name: template mariadb/icingaweb2_user.sql
+  template:
+    src: mariadb/icingaweb2_user.sql.j2
+    dest: /tmp/icingaweb2_user.sql
+  become: true
+
+- name: mysql_db import {{ mariadb_icingaweb2_db }}
+  mysql_db:
+    login_user: "{{ mariadb_icingaweb2_user }}"
+    login_password: "{{ mariadb_icingaweb2_password }}"
+    name: "{{ mariadb_icingaweb2_db }}"
+    state: import
+    target: /tmp/icingaweb2_user.sql
+  become: true
+  when: mariadb_icingaweb2_db_created.changed
+
+- name: file absent /tmp/icingaweb2_user.sql
+  file: 
+    path: /tmp/icingaweb2_user.sql
+    state: absent
+  become: true
+
+- name: file directory /etc/icingaweb2/modules/monitoring/
+  file: 
+    path: /etc/icingaweb2/modules/monitoring/
+    group: icingaweb2
+    state: directory
+  become: true
+
+- name: file directory /etc/icingaweb2/enabledModules
+  file:
+    path: /etc/icingaweb2/enabledModules
+    group: icingaweb2
+    state: directory
+  become: true
+
+- name: template icingaweb2/authentication.ini
+  template:
+    src: icingaweb2/authentication.ini.j2
+    dest: /etc/icingaweb2/authentication.ini
+    group: icingaweb2
+  become: true
+
+- name: template icingaweb2/config.ini
+  template: 
+    src: icingaweb2/config.ini.j2
+    dest: /etc/icingaweb2/config.ini
+    group: icingaweb2
+  become: true
+
+- name: template icingaweb2/resources.ini
+  template:
+    src: icingaweb2/resources.ini.j2
+    dest: /etc/icingaweb2/resources.ini
+    group: icingaweb2
+  become: true
+
+- name: template icingaweb2/roles.ini
+  template:
+    src: icingaweb2/roles.ini.j2
+    dest: /etc/icingaweb2/roles.ini
+    group: icingaweb2
+  become: true
+
+- name: template icingaweb2/modules/monitoring/backends.ini
+  template: 
+    src: icingaweb2/modules/monitoring/backends.ini.j2
+    dest: /etc/icingaweb2/modules/monitoring/backends.ini
+    group: icingaweb2
+  become: true
+
+- name: template icingaweb2/modules/monitoring/commandtransports.ini
+  template:
+    src: icingaweb2/modules/monitoring/commandtransports.ini.j2
+    dest: /etc/icingaweb2/modules/monitoring/commandtransports.ini
+    group: icingaweb2
+  become: true
+
+- name: template icingaweb2/modules/monitoring/config.ini
+  template: 
+    src: icingaweb2/modules/monitoring/config.ini.j2
+    dest: /etc/icingaweb2/modules/monitoring/config.ini
+    group: icingaweb2
+  become: true
+
+- name: file link /etc/icingaweb2/enabledModules/monitoring
+  file: 
+    src: /usr/share/icingaweb2/modules/monitoring
+    dest: /etc/icingaweb2/enabledModules/monitoring
+    state: link
+  become: true
+
+- name: template nginx/sites-available/icingaweb2
+  template:
+    src: nginx/sites-available/icingaweb2.j2
+    dest: /etc/nginx/sites-available/icingaweb2
+  become: true
+
+- name: file link /etc/nginx/sites-enabled/icingaweb2
+  file:
+    src: /etc/nginx/sites-available/icingaweb2
+    dest: /etc/nginx/sites-enabled/icingaweb2
+    state: link
+  become: true
+
+- name: file absent /etc/nginx/sites-enabled/default
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  become: true  
+
+- name: systemd restarted icinga2
+  systemd:
+    state: restarted
+    name: icinga2
+  become: true
+
+- name: systemd restarted nginx
+  systemd:
+    state: restarted
+    name: nginx
+  become: true
+
+- name: systemd restarted php5-fpm
+  systemd:
+    state: restarted
+    name: php5-fpm
+  become: true
