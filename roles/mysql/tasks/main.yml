@@ -1,0 +1,20 @@
+- name: apt present mariadb-server
+  apt:
+    name: mariadb-server
+    state: present
+    update_cache: yes
+  become: true
+
+- name: apt present mariadb-client
+  apt:
+    name: mariadb-client
+    state: present
+    update_cache: yes
+  become: true
+
+- name: apt present python-mysqldb
+  apt:
+    name: python-mysqldb
+    state: present
+    update_cache: yes
+  become: true
