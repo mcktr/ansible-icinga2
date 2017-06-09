@@ -30,6 +30,8 @@
     password: "{{ mysql_icingaweb2_password }}"
     host: localhost
     priv: "{{ mysql_icingaweb2_database }}.*:ALL"
+    login_user: "{{ mysql_root_username }}"
+    login_password: "{{ mysql_root_password }}"
   become: true
   when: mysql_icingaweb2_database_create.changed
 
@@ -44,6 +46,8 @@
     name: "{{ mysql_icingaweb2_database }}"
     target: /tmp/icingaweb2_user.sql
     state: import
+    login_user: "{{ mysql_root_username }}"
+    login_password: "{{ mysql_root_password }}"
   become: true
   when: mysql_icingaweb2_database_create.changed
 
@@ -125,7 +129,7 @@
 
 - name: template nginx/sites-available/icingaweb2
   template:
-    src: nginx/sites-available/icingaweb2.j2
+    src: sites-available/icingaweb2.j2
     dest: /etc/nginx/sites-available/icingaweb2
   become: true
 

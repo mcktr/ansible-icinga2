@@ -8,8 +8,8 @@
 library "db_ido_mysql"
 
 object IdoMysqlConnection "ido-mysql" {
-  user = "{{ mariadb_icinga_user }}",
-  password = "{{ mariadb_icinga_password }}",
+  user = "{{ mysql_icinga2_username }}",
+  password = "{{ mysql_icinga2_password }}",
   host = "localhost",
-  database = "{{ mariadb_icinga_db }}"
+  database = "{{ mysql_icinga2_database }}"
 }

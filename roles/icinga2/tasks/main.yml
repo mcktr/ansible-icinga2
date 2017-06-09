@@ -1,7 +1,8 @@
 - name: template /etc/apt/sources.list.d/icinga.list
-  template 
+  template:
     src: icinga.list.j2
     dest: /etc/apt/sources.list.d/icinga.list
+  become: true
 
 - name: apt_key present {{ icinga_repository_key }}
   apt_key:
