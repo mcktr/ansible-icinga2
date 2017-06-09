@@ -1,6 +1,0 @@
-- name: apt present icinga2-ido-mysql
-  apt:
-    name: icinga2-ido-mysql
-    state: present
-    update_cache: yes
-  become: true

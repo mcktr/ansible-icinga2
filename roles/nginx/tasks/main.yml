@@ -1,0 +1,12 @@
+- name: apt present nginx
+  apt:
+    name: nginx
+    state: present
+    update-cache: yes
+  become: true
+
+- name: file absent /etc/nginx/sites-enabled/default
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  become: true  

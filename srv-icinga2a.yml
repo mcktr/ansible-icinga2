@@ -3,4 +3,7 @@
   become_method: su
   roles:
     - standard
-    - icinga2-master
+    - icinga2
+    - monitoring-plugins
+    - icinga2-ido-mysql
+    - icingaweb2

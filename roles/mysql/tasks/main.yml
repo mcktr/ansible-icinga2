@@ -4,6 +4,7 @@
     state: present
     update_cache: yes
   become: true
+  register: mysql_server_install
 
 - name: apt present mariadb-client
   apt:
@@ -18,3 +19,12 @@
     state: present
     update_cache: yes
   become: true
+
+- name: mysql_user present root
+  mysql_user: 
+    name: root
+    password: "{{ mysql_root_password }}"
+    state: present
+    login_user: "{{ mysql_root_username }}"
+  become: true
+  when: mysql_server_install.changed

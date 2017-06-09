@@ -1,0 +1,11 @@
+icinga_repository_key: https://packages.icinga.com/icinga.key
+mysql_root_username: root
+mysql_root_password: sqlroot
+mysql_icinga2_database: icinga2
+mysql_icinga2_username: icinga2
+mysql_icinga2_password: sqlicinga2
+mysql_icinga2_database_schema_file: /usr/share/icinga2-ido-mysql/schema/mysql.sql
+mysql_icingaweb2_database: icingaweb2
+mysql_icingaweb2_username: icingaweb2
+mysql_icingaweb2_password: sqlicingaweb2
+mysql_icingaweb2_database_schema_file: /usr/share/icingaweb2/etc/schema/mysql.schema.sql
