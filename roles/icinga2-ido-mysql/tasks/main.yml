@@ -1,0 +1,46 @@
+- name: apt present icinga2-ido-mysql
+  apt:
+    name: icinga2-ido-mysql
+    state: present
+    update_cache: yes
+  become: true
+
+- name: mysql_db_present {{ mysql_icinga2_database }}
+  mysql_db:
+    name: "{{ mysql_icinga2_database }}"
+    state: present
+    login_user: "{{ mysql_root_username }}"
+    login_password: "{{ mysql_root_password }}"
+  become: true
+  register: mysql_icinga2_database_create
+
+- name: mysql_db import {{ mysql_icinga2_database }}
+  mysql_db:
+    name: "{{ mysql_icinga2_database }}"
+    target: "{{ mysql_icinga2_database_schema_file }}"
+    state: import
+    login_user: "{{ mysql_root_username }}"
+    login_password: "{{ mysql_root_password }}"
+  become: true
+  when: mysql_icinga2_database_create.changed
+
+- name: mysql_user priv {{ mysql_icinga2_username }}
+  mysql_user:
+    name: "{{ mysql_icinga2_username }}"
+    password: "{{ mysql_icinga2_password }}"
+    host: localhost
+    priv: "{{ mysql_icinga2_database }}.*:ALL"
+    login_user: "{{ mysql_root_username }}"
+    login_password: "{{ mysql_root_password }}"
+  become: true
+  when: mysql_icinga2_database_create.changed
+
+- name: template /etc/icinga2/features-available/ido-mysql.conf
+  template:
+    src: ido-mysql.conf.j2
+    dest: /etc/icinga2/features-available/ido-mysql.conf
+  become: true
+
+- name: command icinga2 feature enable ido-mysql
+  command: /usr/sbin/icinga2 feature enable ido-mysql
+  become: true

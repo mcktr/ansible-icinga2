@@ -1,0 +1,183 @@
+- name: include distribution release based variables
+  include_vars: "{{ ansible_distribution_release }}.yml"
+
+- name: apt present icingaweb2
+  apt:
+    name: icingaweb2
+    state: present
+    update_cache: yes
+  become: true
+
+- name: mysql_db present {{ mysql_icingaweb2_database }}
+  mysql_db:
+    name: "{{ mysql_icingaweb2_database }}"
+    state: present
+    login_user: "{{ mysql_root_username }}"
+    login_password: "{{ mysql_root_password }}"
+  become: true
+  register: mysql_icingaweb2_database_create
+
+- name: mysql_db import {{ mysql_icingaweb2_database }}  
+  mysql_db:
+    name: "{{ mysql_icingaweb2_database }}"
+    target: "{{ mysql_icingaweb2_database_schema_file }}"
+    state: import
+    login_user: "{{ mysql_root_username }}"
+    login_password: "{{ mysql_root_password }}"
+  become: true
+  when: mysql_icingaweb2_database_create.changed
+
+- name: mysql_user priv {{ mysql_icingaweb2_username }}
+  mysql_user:
+    name: "{{ mysql_icingaweb2_username }}"
+    password: "{{ mysql_icingaweb2_password }}"
+    host: localhost
+    priv: "{{ mysql_icingaweb2_database }}.*:ALL"
+    login_user: "{{ mysql_root_username }}"
+    login_password: "{{ mysql_root_password }}"
+  become: true
+  when: mysql_icingaweb2_database_create.changed
+
+- name: template /tmp/icingaweb2_user.sql
+  template:
+    src: icingaweb2_user.sql.j2
+    dest: /tmp/icingaweb2_user.sql
+  become: true
+
+- name: mysql_db import {{ mysql_icingaweb2_database }}
+  mysql_db:
+    name: "{{ mysql_icingaweb2_database }}"
+    target: /tmp/icingaweb2_user.sql
+    state: import
+    login_user: "{{ mysql_root_username }}"
+    login_password: "{{ mysql_root_password }}"
+  become: true
+  when: mysql_icingaweb2_database_create.changed
+
+- name: file absent /tmp/icingaweb2_user.sql
+  file: 
+    path: /tmp/icingaweb2_user.sql
+    state: absent
+  become: true
+
+- name: file directory /etc/icingaweb2/modules/monitoring/
+  file: 
+    path: /etc/icingaweb2/modules/monitoring/
+    group: icingaweb2
+    state: directory
+  become: true
+
+- name: file directory /etc/icingaweb2/enabledModules
+  file:
+    path: /etc/icingaweb2/enabledModules
+    group: icingaweb2
+    state: directory
+  become: true
+
+- name: template icingaweb2/authentication.ini
+  template:
+    src: authentication.ini.j2
+    dest: /etc/icingaweb2/authentication.ini
+    group: icingaweb2
+  become: true
+
+- name: template icingaweb2/config.ini
+  template: 
+    src: config.ini.j2
+    dest: /etc/icingaweb2/config.ini
+    group: icingaweb2
+  become: true
+
+- name: template icingaweb2/resources.ini
+  template:
+    src: resources.ini.j2
+    dest: /etc/icingaweb2/resources.ini
+    group: icingaweb2
+  become: true
+
+- name: template icingaweb2/roles.ini
+  template:
+    src: roles.ini.j2
+    dest: /etc/icingaweb2/roles.ini
+    group: icingaweb2
+  become: true
+
+- name: template icingaweb2/modules/monitoring/backends.ini
+  template: 
+    src: modules/monitoring/backends.ini.j2
+    dest: /etc/icingaweb2/modules/monitoring/backends.ini
+    group: icingaweb2
+  become: true
+
+- name: template icingaweb2/modules/monitoring/commandtransports.ini
+  template:
+    src: modules/monitoring/commandtransports.ini.j2
+    dest: /etc/icingaweb2/modules/monitoring/commandtransports.ini
+    group: icingaweb2
+  become: true
+
+- name: template icingaweb2/modules/monitoring/config.ini
+  template: 
+    src: modules/monitoring/config.ini.j2
+    dest: /etc/icingaweb2/modules/monitoring/config.ini
+    group: icingaweb2
+  become: true
+
+- name: file link /etc/icingaweb2/enabledModules/monitoring
+  file: 
+    src: /usr/share/icingaweb2/modules/monitoring
+    dest: /etc/icingaweb2/enabledModules/monitoring
+    state: link
+  become: true
+
+- name: template nginx/sites-available/icingaweb2
+  template:
+    src: sites-available/icingaweb2.j2
+    dest: /etc/nginx/sites-available/icingaweb2
+  become: true
+
+- name: file link /etc/nginx/sites-enabled/icingaweb2
+  file:
+    src: /etc/nginx/sites-available/icingaweb2
+    dest: /etc/nginx/sites-enabled/icingaweb2
+    state: link
+  become: true
+
+- name: command icinga2 feature enable command
+  command: /usr/sbin/icinga2 feature enable command
+  become: true
+
+- name: user present www-data
+  user:
+    name: www-data
+    groups: nagios
+    append: yes
+    state: present
+  become: true
+
+- name: systemd restarted icinga2
+  systemd:
+    state: restarted
+    name: icinga2
+  become: true
+
+- name: systemd restarted nginx
+  systemd:
+    state: restarted
+    name: nginx
+  become: true
+
+- name: systemd restarted php5-fpm
+  systemd:
+    state: restarted
+    name: php5-fpm
+  become: true
+  when: ansible_distribution_release == 'jessie'
+
+- name: systemd restarted php7.0-fpm
+  systemd:
+    state: restarted
+    name: php7.0-fpm
+  become: true
+  when: ansible_distribution_release == 'stretch'
+

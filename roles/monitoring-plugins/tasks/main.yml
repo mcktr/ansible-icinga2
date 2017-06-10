@@ -1,0 +1,6 @@
+- name: apt present monitoring-plugins
+  apt: 
+    name: monitoring-plugins
+    state: present
+    update_cache: yes
+  become: true

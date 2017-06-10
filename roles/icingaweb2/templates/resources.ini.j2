@@ -1,0 +1,17 @@
+; {{ ansible_managed }}
+
+[icinga2]
+type = "db"
+db = "mysql"
+host = "localhost"
+username = "{{ mysql_icinga2_username }}"
+password = "{{ mysql_icinga2_password }}"
+dbname = "{{ mysql_icinga2_database }}"
+
+[icingaweb2]
+type = "db"
+db = "mysql"
+host = "localhost"
+username = "{{ mysql_icingaweb2_username }}"
+password =  "{{ mysql_icingaweb2_password }}"
+dbname = "{{ mysql_icingaweb2_database }}"
