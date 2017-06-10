@@ -1,5 +1,6 @@
 dependencies:
   - { role: shared-variables }
   - { role: mysql }
-  - { role: php5 }
+  - { role: php5, when: ansible_distribution_release == 'jessie' }
+  - { role: php7.0, when: ansible_distribution_release == 'stretch' }
   - { role: nginx }

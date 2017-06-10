@@ -1,0 +1,41 @@
+- name: apt present php-fpm
+  apt:
+    name: php-fpm
+    state: present
+    update_cache: yes
+  become: true
+
+- name: apt present php-mysql
+  apt: 
+    name: php-mysql
+    state: present
+    update_cache: yes
+  become: true
+
+- name: apt present php-gd
+  apt:
+    name: php-gd
+    state: present
+    update_cache: yes
+  become: true
+
+- name: apt present php-intl
+  apt:
+    name: php-intl
+    state: present
+    update_cache: yes
+  become: true
+
+- name: apt present php-curl
+  apt:
+    name: php-curl
+    state: present
+    update_cache: yes
+  become: true
+
+- name: apt present php-imagick
+  apt:
+    name: php-imagick
+    state: present
+    update_cache: yes
+  become: true

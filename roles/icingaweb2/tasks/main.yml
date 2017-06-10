@@ -1,3 +1,6 @@
+- name: include distribution release based variables
+  include_vars: "{{ ansible_distribution_release }}.yml"
+
 - name: apt present icingaweb2
   apt:
     name: icingaweb2
@@ -169,4 +172,12 @@
     state: restarted
     name: php5-fpm
   become: true
+  when: ansible_distribution_release == 'jessie'
+
+- name: systemd restarted php7.0-fpm
+  systemd:
+    state: restarted
+    name: php7.0-fpm
+  become: true
+  when: ansible_distribution_release == 'stretch'
 
