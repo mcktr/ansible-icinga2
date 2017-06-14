@@ -1,1 +1,1 @@
-php_fpm_sock_path: /var/run/php7.0-fpm.sock;
+php_fpm_sock_path: /var/run/php/php7.0-fpm.sock;
