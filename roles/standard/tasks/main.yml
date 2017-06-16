@@ -1,11 +1,3 @@
-- name: install ssh keys
-  authorized_key:
-    user: administrator
-    state: present
-    key: "{{ item.key }}"
-  with_items: "{{ pubkeys }}"
-  become: true
-
 - name: configure apt sources
   template:
     dest: /etc/apt/sources.list
@@ -13,12 +5,12 @@
   become: true
 
 - name: configure nano
-  template: 
+  template:
     dest: /etc/nanorc
     src: nanorc.j2
   become: true
 
-- name: enable bash auto completion 
+- name: enable bash auto completion
   template:
     dest: /etc/bash.bashrc
     src: bash.bashrc.j2
