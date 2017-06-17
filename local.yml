@@ -1,8 +1,11 @@
-- hosts: icinga2-master
+- hosts: localhost
   become_user: root
   become_method: su
   roles:
-    - standard
+    - apt
+    - nano
+    - bashrc
+    - htop
     - icinga2
     - monitoring-plugins
     - icinga2-ido-mysql

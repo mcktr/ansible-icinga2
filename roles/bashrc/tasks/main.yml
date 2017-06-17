@@ -1,0 +1,5 @@
+- name: configure bashrc
+  template:
+    dest: /etc/bash.bashrc
+    src: bash.bashrc.j2
+  become: true

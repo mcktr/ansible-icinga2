@@ -1,0 +1,5 @@
+- name: install htop
+  apt:
+    name: htop
+    update_cache: yes
+  become: true

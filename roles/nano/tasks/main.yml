@@ -1,0 +1,5 @@
+- name: configure nanorc
+  template:
+    dest: /etc/nanorc
+    src: nanorc.j2
+  become: true
