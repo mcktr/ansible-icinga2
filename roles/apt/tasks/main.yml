@@ -1,0 +1,5 @@
+- name: configure default apt sources
+  template:
+    dest: /etc/apt/sources.list
+    src: sources.list.j2
+  become: true
