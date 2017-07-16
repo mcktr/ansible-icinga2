@@ -6,7 +6,7 @@
   become: true
 
 - name: apt present php5-mysql
-  apt: 
+  apt:
     name: php5-mysql
     state: present
     update_cache: yes
@@ -39,3 +39,9 @@
     state: present
     update_cache: yes
   become: true
+
+- name: set timezone in php.ini
+  lineinfile:
+    path: /etc/php5/fpm/php.ini
+    regexp: ';date\.timezone ='
+    line: 'date.timezone = Europe/Berlin'
