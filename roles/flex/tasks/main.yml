@@ -1,0 +1,6 @@
+- name: apt present flex
+  apt:
+    name: flex
+    state: present
+    update_cache: yes
+  become: true

@@ -1,0 +1,6 @@
+- name: apt present pkg-config
+  apt:
+    name: pkg-config
+    state: present
+    update_cache: yes
+  become: true

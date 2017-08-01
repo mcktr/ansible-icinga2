@@ -1,0 +1,6 @@
+- name: apt present libedit-dev
+  apt:
+    name: libedit-dev
+    state: present
+    update_cache: yes
+  become: true

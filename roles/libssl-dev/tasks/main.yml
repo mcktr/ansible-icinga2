@@ -1,0 +1,6 @@
+- name: apt present libssl-dev
+  apt:
+    name: libssl-dev
+    state: present
+    update_cache: yes
+  become: true

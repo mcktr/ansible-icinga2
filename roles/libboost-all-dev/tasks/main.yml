@@ -1,0 +1,6 @@
+- name: apt present libboost-all-dev
+  apt:
+    name: libboost-all-dev
+    state: present
+    update_cache: yes
+  become: true

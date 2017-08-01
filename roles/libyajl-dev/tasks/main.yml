@@ -1,0 +1,6 @@
+- name: apt present libyajl-dev
+  apt:
+    name: libyajl-dev
+    state: present
+    update_cache: yes
+  become: true

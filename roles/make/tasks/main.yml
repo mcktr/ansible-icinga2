@@ -1,0 +1,6 @@
+- name: apt present make
+  apt:
+    name: make
+    state: present
+    update_cache: yes
+  become: true

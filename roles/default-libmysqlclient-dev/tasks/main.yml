@@ -1,0 +1,6 @@
+- name: apt present default-libmysqlclient-dev
+  apt:
+    name: default-libmysqlclient-dev
+    state: present
+    update_cache: yes
+  become: true

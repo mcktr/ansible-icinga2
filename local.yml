@@ -6,7 +6,15 @@
     - nano
     - bashrc
     - htop
-    - icinga2
-    - monitoring-plugins
-    - icinga2-ido-mysql
-    - icingaweb2
+    - cmake
+    - make
+    - build-essential
+    - pkg-config
+    - libssl-dev
+    - libboost-all-dev
+    - bison
+    - flex
+    - default-libmysqlclient-dev
+    - libpq-dev
+    - libyajl-dev
+    - libedit-dev
