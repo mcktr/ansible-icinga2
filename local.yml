@@ -19,3 +19,7 @@
     - libyajl-dev
     - libedit-dev
     - git
+    - debhelper
+    - dh-systemd
+    - libwxgtk3.0-dev
+    - po-debconf

@@ -1,0 +1,6 @@
+- name: apt present libwxgtk3.0-dev
+  apt:
+    name: libwxgtk3.0-dev
+    state: present
+    update_cache: yes
+  become: true
