@@ -1,0 +1,6 @@
+- name: apt present git
+  apt:
+    name: git
+    state: present
+    update_cache: yes
+  become: true
